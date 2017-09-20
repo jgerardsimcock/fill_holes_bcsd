@@ -98,13 +98,10 @@ MODELS = list(map(lambda x: dict(model=x), [
 JOB_SPEC = [MODELS, PERIODS, VARS]
 
 
-def validate(ds):
-
-    msg_dims = 'unexpected dimensions: {}'.format(ds.dims)
-    assert ds.dims == {'lon', 1440, 'lat', 720, 'time', 365}, msg_dims
+def validate(ds, variable):
     
     msg_null = 'failed to remove null values on {}'.format(ds.attrs['dependencies'])
-    assert not ds[varname].isnull().any(), msg_null
+    assert not ds[variable].isnull().any(), msg_null
 
 
 
@@ -166,7 +163,7 @@ def fill_holes_bcsd(
 
     logger.debug('validating output')
     with xr.open_dataset(write_file + '~') as test:
-        validate(test)
+        validate(test, variable)
 
 
     logger.debug(
