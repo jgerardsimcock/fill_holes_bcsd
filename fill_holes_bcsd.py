@@ -135,10 +135,10 @@ def fill_holes_bcsd(
     if os.path.isfile(write_file) and not interactive:
         return
 
-    with xr.open_dataset(fp) as ds:
+    with xr.open_dataset(read_file) as ds:
         ds.load()
 
-    logger.debug('year {} - attempting to read file "{}"'.format(year, fp))
+    logger.debug('year {} - attempting to read file "{}"'.format(year, read_file))
 
     ds = load_bcsd(ds, variable, broadcast_dims=('time',))
 
