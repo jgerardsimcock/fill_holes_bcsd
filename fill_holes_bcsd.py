@@ -145,8 +145,7 @@ def fill_holes_bcsd(
     varattrs = {var: dict(ds[var].attrs) for var in ds.data_vars.keys()}
 
     # Update netCDF metadata
-    ds.attrs.update(**{
-        k: str(v) for k, v in metadata.items() if k in INCLUDED_METADATA})
+    
     ds.attrs.update(metadata)
 
 
