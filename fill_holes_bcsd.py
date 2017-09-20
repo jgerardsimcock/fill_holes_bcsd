@@ -95,7 +95,7 @@ MODELS = list(map(lambda x: dict(model=x), [
     ]))
 
 
-JOBS = [MODELS, PERIODS, VARS]
+JOB_SPEC = [MODELS, PERIODS, VARS]
 
 
 def validate(ds):
