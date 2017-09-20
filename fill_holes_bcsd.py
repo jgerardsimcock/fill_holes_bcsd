@@ -112,7 +112,6 @@ def validate(ds):
 def fill_holes_bcsd(
         metadata,
         variable,
-        variable,
         scenario,
         year,
         model,
