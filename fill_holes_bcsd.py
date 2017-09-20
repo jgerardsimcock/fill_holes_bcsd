@@ -16,8 +16,8 @@ logging.basicConfig(format=FORMAT)
 logger = logging.getLogger('uploader')
 logger.setLevel('DEBUG')
 
-__author__ = 'Michael Delgado'
-__contact__ = 'mdelgado@rhg.com'
+__author__ = 'Justin Gerard'
+__contact__ = 'jsimcock@rhg.com'
 __version__ = '1.0'
 
 
@@ -27,7 +27,7 @@ BCSD_orig_files = (
     '{variable}_day_BCSD_{scenario}_r1i1p1_{model}_{year}.nc')
 
 WRITE_PATH = (
-    '/global/scratch/jsimcock//gcp/climate/' +
+    '/global/scratch/jsimcock/gcp/climate/' +
     'nasa_bcsd/reformatted/{variable}/{scenario}/{model}/{year}/' +
     '{version}.nc4')
 
@@ -98,6 +98,16 @@ MODELS = list(map(lambda x: dict(model=x), [
 JOBS = [MODELS, PERIODS, VARS]
 
 
+def validate(ds):
+
+    msg_dims = 'unexpected dimensions: {}'.format(ds.dims)
+    assert ds.dims == {'lon', 1440, 'lat', 720, 'time', 365}, msg_dims
+    
+    msg_null 'failed to remove null values on {}'.format(ds.attrs['dependencies'])
+    assert not ds[varname].isnull().any(), msg_null
+
+
+
 @slurm_runner(filepath=__file__, job_spec=JOB_SPEC)
 def fill_holes_bcsd(
         metadata,
@@ -120,12 +130,11 @@ def fill_holes_bcsd(
 
     read_file = BCSD_orig_files.format(**metadata)
     write_file = WRITE_PATH.format(**metadata)
+    metadata['dependencies'] = read_file
 
     # do not duplicate
     if os.path.isfile(write_file) and not interactive:
         return
-
-    # Get transformed data
 
     with xr.open_dataset(fp) as ds:
         ds.load()
@@ -139,13 +148,8 @@ def fill_holes_bcsd(
     # Update netCDF metadata
     ds.attrs.update(**{
         k: str(v) for k, v in metadata.items() if k in INCLUDED_METADATA})
-    ds.attrs.update(ADDITIONAL_METADATA)
+    ds.attrs.update(metadata)
 
-    attrs = dict(ds.attrs)
-    attrs['file_dependencies'] = file_dependencies
-
-    for var, vattrs in varattrs.items():
-        ds[var].attrs.update(vattrs)
 
     if interactive:
         return ds
@@ -158,14 +162,20 @@ def fill_holes_bcsd(
 
         os.makedirs(os.path.dirname(write_file))
 
-    logger.debug('attempting to write to file "{}"'.format(write_file))
+    logger.debug(
+        'writing to temporary file "{}"'.format(write_file))
+    ds.to_netcdf(write_file + '~')
 
-    ds.to_netcdf(write_file)
+    logger.debug('validating output')
+    with xr.open_dataset(write_file + '~') as test:
+        validate(test)
 
-    metacsv.to_header(
-        write_file.replace('.nc4', '.fgh'),
-        attrs=dict(attrs),
-        variables=varattrs)
+
+    logger.debug(
+        'validation complete. saving file in output location "{}"'
+        .format(write_file))
+
+    os.rename(write_file + '~', write_file)
 
     logger.debug('job done')
 
