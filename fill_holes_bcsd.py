@@ -103,7 +103,7 @@ def validate(ds):
     msg_dims = 'unexpected dimensions: {}'.format(ds.dims)
     assert ds.dims == {'lon', 1440, 'lat', 720, 'time', 365}, msg_dims
     
-    msg_null 'failed to remove null values on {}'.format(ds.attrs['dependencies'])
+    msg_null = 'failed to remove null values on {}'.format(ds.attrs['dependencies'])
     assert not ds[varname].isnull().any(), msg_null
 
 
