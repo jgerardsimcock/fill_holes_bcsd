@@ -99,10 +99,12 @@ JOB_SPEC = [MODELS, PERIODS, VARS]
 
 
 def validate(ds, variable):
+    varname = ds.variable
+
     
     msg_null = 'failed to remove null values on {}'.format(ds.attrs['dependencies'])
-    assert not ds[variable].isnull().any(), msg_null
-
+    assert not ds[varname].loc[{'lat': (ds.lat > -85) & (ds.lat < 85)}].isnull().any(), msg_null
+        
 
 
 @slurm_runner(filepath=__file__, job_spec=JOB_SPEC)
