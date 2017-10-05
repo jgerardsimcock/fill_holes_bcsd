@@ -7,14 +7,16 @@ version 1.0 - initial release
 
 import os
 import logging
+import time
 
 from jrnr.jrnr import slurm_runner
 
 FORMAT = '%(asctime)-15s %(message)s'
 logging.basicConfig(format=FORMAT)
 
-logger = logging.getLogger('uploader')
+logger = logging.getLogger('jrnr')
 logger.setLevel('DEBUG')
+
 
 __author__ = 'Justin Gerard'
 __contact__ = 'jsimcock@rhg.com'
@@ -116,6 +118,7 @@ def fill_holes_bcsd(
         model,
         interactive=False):
 
+    t1 = time.time()
     import xarray as xr
     import metacsv
 
@@ -163,6 +166,10 @@ def fill_holes_bcsd(
         'writing to temporary file "{}"'.format(write_file))
     ds.to_netcdf(write_file + '~')
 
+
+    t2 = time.time()
+    logger.debug('transformation complete: {}'.format(t2-t1))
+
     logger.debug('validating output')
     with xr.open_dataset(write_file + '~') as test:
         validate(test, variable)
@@ -174,7 +181,9 @@ def fill_holes_bcsd(
 
     os.rename(write_file + '~', write_file)
 
-    logger.debug('job done')
+    t3 = time.time()
+    logger.debug('validation complete: {}'.format(t3 -t2))
+    logger.debug('job complete: {}'.format(t3 -t1))
 
 
 if __name__ == '__main__':
