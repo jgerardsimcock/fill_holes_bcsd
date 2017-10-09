@@ -164,7 +164,7 @@ def fill_holes_bcsd(
 
     logger.debug(
         'writing to temporary file "{}"'.format(write_file))
-    ds.to_netcdf(write_file + '~')
+    ds.to_netcdf(write_file + '~',  encoding={variable: {'dtype': 'float32'}})
 
 
     t2 = time.time()
