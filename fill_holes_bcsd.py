@@ -141,7 +141,7 @@ def fill_holes_bcsd(
 
     logger.debug('year {} - attempting to read file "{}"'.format(year, read_file))
 
-    encoding = ds.variable.encoding
+    encoding = ds[variable].encoding
 
     ds = load_bcsd(ds, variable, broadcast_dims=('time',))
 
@@ -152,7 +152,7 @@ def fill_holes_bcsd(
     ds.attrs.update(metadata)
 
     for k,v in encoding.items():
-        ds.variable.encoding[k] = v 
+        ds[variable].encoding[k] = v 
 
 
     if interactive:
