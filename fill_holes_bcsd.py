@@ -142,6 +142,8 @@ def fill_holes_bcsd(
 
     logger.debug('year {} - attempting to read file "{}"'.format(year, read_file))
 
+    encoding = ds.variable.encoding
+
     ds = load_bcsd(ds, variable, broadcast_dims=('time',))
 
     varattrs = {var: dict(ds[var].attrs) for var in ds.data_vars.keys()}
@@ -149,6 +151,9 @@ def fill_holes_bcsd(
     # Update netCDF metadata
     
     ds.attrs.update(metadata)
+
+    for k,v in encoding.items():
+        ds.variable.encoding[k] = v 
 
 
     if interactive:
@@ -164,7 +169,7 @@ def fill_holes_bcsd(
 
     logger.debug(
         'writing to temporary file "{}"'.format(write_file))
-    ds.to_netcdf(write_file + '~',  encoding={variable: {'dtype': 'float32'}})
+    ds.to_netcdf(write_file + '~')
 
 
     t2 = time.time()
