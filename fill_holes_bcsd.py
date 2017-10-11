@@ -62,10 +62,9 @@ def format_docstr(docstr):
 
     return '\n\n'.join(pars)
 
-VARS = ([dict(variable='tasmax')] +
-         [dict(variable='tasmin')] +
-         [dict(variable='tas')]
-         )
+VARS = (
+        [dict(variable='tas')]
+        )
 
 PERIODS = (
     [dict(scenario='historical', year=y) for y in range(1981, 2006)] +
