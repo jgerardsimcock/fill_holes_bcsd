@@ -18,7 +18,7 @@ logger = logging.getLogger('jrnr')
 logger.setLevel('DEBUG')
 
 
-__author__ = 'Justin Gerard'
+__author__ = 'Justin Simcock'
 __contact__ = 'jsimcock@rhg.com'
 __version__ = '1.0'
 
